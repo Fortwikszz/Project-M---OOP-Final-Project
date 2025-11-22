@@ -1,7 +1,7 @@
 import pygame
 pygame.init()
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1280, 720
 FPS = 60
 
 while True:
