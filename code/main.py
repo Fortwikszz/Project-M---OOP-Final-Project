@@ -1,7 +1,6 @@
 import pygame, sys
 from settings import *
-from main_mape import *
-from main_awi import *
+from level import *
 pygame.init()
 
 
@@ -15,7 +14,7 @@ class Game:
 		self.clock = pygame.time.Clock()
 
 		# level setup
-		self.main_mape = Level()
+		self.level = Level()
 	
 	def run(self):
 		while True:
@@ -23,11 +22,14 @@ class Game:
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					sys.exit()
+				if event.type == pygame.MOUSEBUTTONDOWN:
+					if event.button == 1:
+						self.level.player.attack()
 			
 			# game loop
 			self.screen.fill('black')
-			self.main_mape.run()
-			pygame.display.update()
+			self.level.run()
+			pygame.display.flip()
 			self.clock.tick(FPS)
 
 if __name__ == '__main__':
