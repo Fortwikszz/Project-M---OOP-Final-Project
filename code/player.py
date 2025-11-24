@@ -1,12 +1,15 @@
 import pygame 
 from settings import *
+import os
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self,pos,groups):
 		super().__init__(groups)
-		self.idle_image = pygame.image.load("C:\\aaa\\piton\\pbo\\fp\\assets\\Tiny Swords (Free Pack)\\Tiny Swords (Free Pack)\\Units\\Black Units\\Warrior\\Warrior_Idle.png").convert_alpha()
-		self.running_image = pygame.image.load("C:\\aaa\\piton\\pbo\\fp\\assets\\Tiny Swords (Free Pack)\\Tiny Swords (Free Pack)\\Units\\Black Units\\Warrior\\Warrior_Run.png").convert_alpha()
-		self.attack_image = pygame.image.load("C:\\aaa\\piton\\pbo\\fp\\assets\\Tiny Swords (Free Pack)\\Tiny Swords (Free Pack)\\Units\\Black Units\\Warrior\\Warrior_Attack1.png").convert_alpha()
+		# Use relative path from project root
+		assets_path = os.path.join("assets", "Tiny Swords (Free Pack)", "Tiny Swords (Free Pack)", "Units", "Black Units", "Warrior")
+		self.idle_image = pygame.image.load(os.path.join(assets_path, "Warrior_Idle.png")).convert_alpha()
+		self.running_image = pygame.image.load(os.path.join(assets_path, "Warrior_Run.png")).convert_alpha()
+		self.attack_image = pygame.image.load(os.path.join(assets_path, "Warrior_Attack1.png")).convert_alpha()
 		self.sheet_width, self.sheet_height = self.idle_image.get_size()
 		self.frame_width = self.sheet_width // 8
 		self.frame_height = self.sheet_height // 1
