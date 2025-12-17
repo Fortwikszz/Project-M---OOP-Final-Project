@@ -155,6 +155,8 @@ class Game:
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					if event.button == 1:
 						self.level.player.attack()
+					if event.button == 3:
+						self.level.player.dodge()
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_ESCAPE:
 						# Pause game

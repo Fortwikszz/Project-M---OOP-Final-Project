@@ -54,7 +54,7 @@ class Player(pygame.sprite.Sprite):
 		self.anim_interval = 0
 
 		self.direction = pygame.math.Vector2()
-		self.speed = 5
+		self.speed = 3
 		self.orientation = 'right'
 
 		self.attack_anim = False
@@ -79,7 +79,9 @@ class Player(pygame.sprite.Sprite):
 		
 		# Invincibility frames
 		self.invincibility_timer = 0
-		self.invincibility_duration = 60  # 1 second at 60 FPS
+		self.invincibility_duration = 30
+
+		self.dodging = False
 
 	def input(self):
 		keys = pygame.key.get_pressed()
@@ -118,6 +120,13 @@ class Player(pygame.sprite.Sprite):
 			self.collide('vertical')
 			self.rect.center = self.hitbox.center
 
+	def dodge(self):
+		if self.dodging == False:
+			if self.stamina >= 20:
+				self.dodging = True
+				self.speed += 5
+				self.stamina -= 20
+
 	def attack(self):
 		if self.attack_anim == False and self.stamina >= 10:
 			self.speed -= 2
@@ -132,18 +141,18 @@ class Player(pygame.sprite.Sprite):
 	def collide(self, direction):
 		if direction == 'horizontal':
 			for sprite in self.obstacle_sprites:
-				if sprite.rect.colliderect(self.hitbox):
+				if sprite.hitbox.colliderect(self.hitbox):
 					if self.direction.x > 0: # moving right
-						self.hitbox.right = sprite.rect.left
+						self.hitbox.right = sprite.hitbox.left
 					if self.direction.x < 0: # moving left
-						self.hitbox.left = sprite.rect.right
+						self.hitbox.left = sprite.hitbox.right
 		if direction == 'vertical':
 			for sprite in self.obstacle_sprites:
-				if sprite.rect.colliderect(self.hitbox):
+				if sprite.hitbox.colliderect(self.hitbox):
 					if self.direction.y > 0: # moving down
-						self.hitbox.bottom = sprite.rect.top
+						self.hitbox.bottom = sprite.hitbox.top
 					if self.direction.y < 0: # moving up
-						self.hitbox.top = sprite.rect.bottom
+						self.hitbox.top = sprite.hitbox.bottom
 
 	def animate(self):
 		if self.attack_anim:
@@ -173,7 +182,9 @@ class Player(pygame.sprite.Sprite):
 			if self.orientation == 'left':
 				temp_image = pygame.transform.flip(temp_image, True, False)
 			self.image = temp_image
-			self.create_attack_hitbox()
+			# Only create hitbox on second to last frame (frame 2 out of 0,1,2,3)
+			if self.current_frame == 2:
+				self.create_attack_hitbox()
 			return
 		else:
 			src_rect = pygame.Rect(
@@ -230,9 +241,14 @@ class Player(pygame.sprite.Sprite):
 		# Update invincibility timer
 		if self.invincibility_timer > 0:
 			self.invincibility_timer -= 1
+		if self.dodging:
+			self.speed -= 0.2
+			if self.speed <= 3:
+				self.speed = 3
+				self.dodging = False
 	
 	def take_damage(self, damage):
-		if self.invincibility_timer <= 0:
+		if self.invincibility_timer <= 0 and self.dodging == False:
 			actual_damage = max(1, damage - self.defense)
 			self.health -= actual_damage
 			if self.health < 0:

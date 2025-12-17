@@ -112,7 +112,12 @@
 </data>
  </layer>
  <objectgroup id="3" name="Tree and Build">
-  <object id="30" gid="65" x="706" y="342" width="762" height="622"/>
+  <object id="30" gid="65" x="706" y="342" width="762" height="622">
+   <properties>
+    <property name="interactable" type="bool" value="true"/>
+    <property name="message" value="Boss"/>
+   </properties>
+  </object>
   <object id="32" gid="64" x="494" y="250" width="336" height="332"/>
   <object id="35" gid="64" x="1356" y="236" width="310" height="312"/>
  </objectgroup>

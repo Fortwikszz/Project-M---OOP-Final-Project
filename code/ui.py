@@ -373,6 +373,63 @@ class UI:
         exp_text_rect = exp_text.get_rect(center=(panel_x + panel_width // 2, exp_bar_y + exp_bar_height // 2))
         self.display_surface.blit(exp_text, exp_text_rect)
 
+    def display_interaction_prompt(self):
+        screen_width = self.display_surface.get_width()
+        screen_height = self.display_surface.get_height()
+        
+        # Position at bottom center
+        prompt_text = self.font_large.render('Press E to BOSS', True, (255, 255, 255))
+        prompt_rect = prompt_text.get_rect(center=(screen_width // 2, screen_height - 100))
+        
+        # Background box
+        bg_rect = prompt_rect.inflate(40, 20)
+        pygame.draw.rect(self.display_surface, (40, 40, 60, 230), bg_rect)
+        pygame.draw.rect(self.display_surface, (255, 215, 0), bg_rect, 3)
+        
+        # Draw text
+        self.display_surface.blit(prompt_text, prompt_rect)
+    
+    def draw_boss_health_bar(self, boss):
+        """Draw boss health bar at bottom center of screen"""
+        if not boss:
+            return
+        
+        screen_width = self.display_surface.get_width()
+        screen_height = self.display_surface.get_height()
+        
+        # Boss HP bar dimensions and position
+        bar_width = 600
+        bar_height = 40
+        bar_x = (screen_width - bar_width) // 2
+        bar_y = screen_height - 80
+        
+        # Calculate health ratio
+        health_ratio = max(0, boss.health / boss.max_health)
+        
+        # Draw background
+        bg_rect = pygame.Rect(bar_x - 10, bar_y - 10, bar_width + 20, bar_height + 40)
+        pygame.draw.rect(self.display_surface, (20, 20, 30, 230), bg_rect)
+        pygame.draw.rect(self.display_surface, (200, 0, 0), bg_rect, 3)
+        
+        # Draw health bar background
+        pygame.draw.rect(self.display_surface, (60, 20, 20), (bar_x, bar_y, bar_width, bar_height))
+        
+        # Draw health bar fill
+        pygame.draw.rect(self.display_surface, (220, 20, 20), (bar_x, bar_y, bar_width * health_ratio, bar_height))
+        
+        # Draw border
+        pygame.draw.rect(self.display_surface, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height), 3)
+        
+        # Boss name text
+        boss_name = self.font_large.render('BOSS', True, (255, 50, 50))
+        boss_name_rect = boss_name.get_rect(center=(screen_width // 2, bar_y - 20))
+        self.display_surface.blit(boss_name, boss_name_rect)
+        
+        # Health text
+        health_text = self.font.render(f'{int(boss.health)}/{int(boss.max_health)}', True, (255, 255, 255))
+        health_text_rect = health_text.get_rect(center=(screen_width // 2, bar_y + bar_height // 2))
+        self.display_surface.blit(health_text, health_text_rect)
+
     def display(self):
         self.draw_health_bar()
         self.draw_stamina_bar()
