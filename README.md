@@ -89,8 +89,8 @@ pip install pygame-ce
 ```bash
 ### Typo: 'pyhton' is not recognized
 
-Make sure to type `python` correctly (not `pyhton`)
-```bash
+Make sure to type `python` correctly
+
 # Correct ✅
 python -m code.main
 
