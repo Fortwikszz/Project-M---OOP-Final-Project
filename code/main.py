@@ -62,7 +62,6 @@ class Game:
 			
 			if choice == 0:  # Start Game
 				self.state = 'playing'
-				# Music sudah playing background dari menu, jadi tidak perlu stop/restart
 				self.level = Level()  # Initialize level when starting game
 			elif choice == 1:  # Quit
 				pygame.quit()

@@ -1,15 +1,15 @@
 # Project M - OOP Final Project
 
-Game project menggunakan Pygame-CE dan Python 3.12
+A game project built with Pygame-CE and Python 3.12
 
 ## Prerequisites
 
-- Python 3.10 atau lebih baru
+- Python 3.10 or newer
 - pip (Python package manager)
 
-## Instalasi
+## Installation
 
-1. **Clone atau download repository ini**
+1. **Clone or download this repository**
    ```bash
    git clone https://github.com/Fortwikszz/Project-M---OOP-Final-Project.git
    cd Project-M---OOP-Final-Project
@@ -17,82 +17,99 @@ Game project menggunakan Pygame-CE dan Python 3.12
 
 2. **Install dependencies**
    
-   Ada 2 cara:
+   Two options:
 
-   **Cara 1: Menggunakan pip langsung**
+   **Option 1: Using pip directly**
    ```bash
    pip install pygame-ce
    ```
 
-   **Cara 2: Menggunakan requirements.txt**
+   **Option 2: Using requirements.txt**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Jalankan game**
+3. **Run the game**
    
-   Pastikan Anda berada di folder root project (bukan di folder `code`), lalu jalankan:
+   Make sure you're in the project root folder, then run:
    
    ```bash
-   python code/main.py
+   python -m code.main
    ```
 
-   Atau jika menggunakan Python 3 secara spesifik:
+   Or if using Python 3 specifically:
    ```bash
-   python3 code/main.py
+   python3 -m code.main
    ```
 
-## Cara Bermain
+## How to Play
 
-- **Gerak**: Gunakan tombol Arrow Keys (↑↓←→) atau WASD
-- **Attack**: Klik kiri mouse
-- **Keluar**: Tutup window atau tekan tombol X
+- **Movement**: Use Arrow Keys (↑↓←→) or WASD
+- **Attack**: Left mouse click
+- **Dodge**: Right mouse click
+- **Pause**: Press ESC
+- **Quit**: Close window or press X button
 
-## Struktur Project
+## Project Structure
 
 ```
 Project-M---OOP-Final-Project/
-├── assets/              # Asset gambar dan sprites
-│   ├── Tiny Swords (Free Pack)/
-│   └── Tiny Swords (Update 010)/
-├── code/                # Source code
-│   ├── main.py         # Entry point
-│   ├── level.py        # Level management
-│   ├── player.py       # Player class
-│   ├── tiled.py        # Tile class
-│   └── settings.py     # Game settings
-├── test/               # Test assets
-├── requirements.txt    # Dependencies
-└── README.md          # This file
+├── assets/              # Image assets and sprites
+│   ├── maps/           # Map files (.tmx)
+│   ├── Monster/        # Monster sprites
+│   └── Tiny Swords/    # Game assets
+├── audio/              # Audio files
+├── code/               # Source code
+│   ├── main.py        # Entry point
+│   ├── level.py       # Level management
+│   ├── player.py      # Player class
+│   ├── enemy.py       # Enemy class
+│   ├── entity.py      # Base entity class
+│   ├── tiled.py       # Tile class
+│   ├── ui.py          # UI and menus
+│   └── settings.py    # Game settings
+├── requirements.txt   # Dependencies
+└── README.md         # This file
 ```
 
 ## Troubleshooting
 
 ### Error: ModuleNotFoundError: No module named 'pygame'
 
-Solusi: Install pygame-ce terlebih dahulu
+Solution: Install pygame-ce first
 ```bash
 pip install pygame-ce
 ```
-
-### Error: No file '...' found
-
-Solusi: Pastikan Anda menjalankan game dari **folder root** project (bukan dari folder `code`)
 ```bash
-# Benar ✅
+# Correct ✅
 cd Project-M---OOP-Final-Project
-python code/main.py
+python -m code.main
 
-# Salah ❌
+# Wrong ❌
 cd Project-M---OOP-Final-Project/code
 python main.py
 ```
 
-### Window tidak muncul atau langsung tertutup
+### Typo: 'pyhton' is not recognized
 
-- Pastikan tidak ada error di terminal
-- Cek apakah window muncul di belakang window lain
-- Lihat taskbar untuk window "Projeect M"
+Make sure to type `python` correctly (not `pyhton`)
+```bash
+# Correct ✅
+python -m code.main
+
+# Wrong ❌
+pyhton -m code.main
+
+# Wrong ❌
+cd Project-M---OOP-Final-Project/code
+python main.py
+```
+
+### Window doesn't appear or closes immediately
+
+- Make sure there are no errors in the terminal
+- Check if the window appeared behind other windows
+- Look for "Projeect M" window in the taskbar
 
 ## Credits
 
