@@ -1,7 +1,7 @@
 import pygame
 from code.settings import *
 from code.tiled import Tile
-from code.player import Player
+from code.player import Player, AttackHitbox
 import pytmx
 import os
 
@@ -19,6 +19,9 @@ class Level:
         
         # sprite setup
         self.create_map()
+
+        # attack hitbox
+        self.current_attack_hitbox = None
         
     def create_map(self):
         # Load TMX map file
@@ -30,8 +33,11 @@ class Level:
         self.map_height = tmx_data.height * TILESIZE
         self.map_rect = pygame.Rect(0, 0, self.map_width, self.map_height)
         
+        # Track current attack hitbox
+        self.current_attack_hitbox = None
+        
         # Create player at a starting position
-        self.player = Player((128, 128), [self.visible_sprites, self.decoration_sprites], self.obstacle_sprites)
+        self.player = Player((128, 128), [self.visible_sprites, self.decoration_sprites], self.obstacle_sprites, self.create_attack_hitbox, self.delete_attack_hitbox)
         
         # Render all layers
         for layer in tmx_data.visible_layers:
@@ -47,12 +53,28 @@ class Level:
             elif isinstance(layer, pytmx.TiledObjectGroup):
                 for obj in layer:
                     if obj.image:
-                        # Objects with images (buildings, trees, etc.) - use Y-sort
-                        Tile((obj.x, obj.y - obj.height), [self.visible_sprites, self.decoration_sprites, self.obstacle_sprites], obj.image)
+                        scaled_image = pygame.transform.scale(obj.image, (int(obj.width), int(obj.height)))
+                        Tile((obj.x, obj.y), [self.visible_sprites, self.decoration_sprites, self.obstacle_sprites], scaled_image)
         
     def run(self):
         self.visible_sprites.update(self.map_rect) 
         self.visible_sprites.custom_draw(self.player, self.ground_sprites, self.decoration_sprites)
+
+    def create_attack_hitbox(self):
+        # Delete previous hitbox if it exists
+        if self.current_attack_hitbox:
+            self.current_attack_hitbox.kill()
+        self.current_attack_hitbox = AttackHitbox(self.player, [self.visible_sprites, self.decoration_sprites])
+    
+    def delete_attack_hitbox(self):
+        if self.current_attack_hitbox:
+            self.current_attack_hitbox.kill()
+            self.current_attack_hitbox = None
+
+    def delete_attack_hitbox(self):
+        if self.current_attack_hitbox:
+            self.current_attack_hitbox.kill()
+        self.current_attack_hitbox = None
 
 class YsortCameraGroup(pygame.sprite.Group):
     def __init__(self):

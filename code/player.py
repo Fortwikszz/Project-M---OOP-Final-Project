@@ -3,7 +3,7 @@ from code.settings import *
 import os
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self,pos,groups, obstacle_sprites):
+	def __init__(self,pos,groups, obstacle_sprites, create_attack_hitbox, delete_attack_hitbox):
 		super().__init__(groups)
 		# Use relative path from project root
 		assets_path = os.path.join("assets", "Tiny Swords (Free Pack)", "Tiny Swords (Free Pack)", "Units", "Black Units", "Warrior")
@@ -23,9 +23,9 @@ class Player(pygame.sprite.Sprite):
 			self.frame_width*3//4,
 			self.frame_height*3//4
 		))
-		self.image = pygame.transform.scale(temp_image, (64, 64))
+		self.image = pygame.transform.scale(temp_image, (96, 96))
 		self.rect = self.image.get_rect(topleft = pos)
-		self.hitbox = self.rect.inflate(0, 0)
+		self.hitbox = self.rect.inflate(-20, -60)
 		self.anim_interval = 0
 
 		self.direction = pygame.math.Vector2()
@@ -34,6 +34,8 @@ class Player(pygame.sprite.Sprite):
 
 		self.attack_anim = False
 		self.attack_frame = 0
+		self.create_attack_hitbox = create_attack_hitbox
+		self.delete_attack_hitbox = delete_attack_hitbox
 
 		self.obstacle_sprites = obstacle_sprites
 
@@ -103,6 +105,7 @@ class Player(pygame.sprite.Sprite):
 			if self.attack_frame <= 0:
 				self.attack_anim = False
 				self.speed += 2
+				self.delete_attack_hitbox()  # Remove attack hitbox when attack ends
 			self.current_frame = (self.current_frame + 1) % 4
 			self.update_sprite()
 		else:
@@ -118,10 +121,11 @@ class Player(pygame.sprite.Sprite):
 				self.frame_height*3//4
 			)
 			temp_image = self.attack_image.subsurface(src_rect)
-			temp_image = pygame.transform.scale(temp_image, (64, 64))
+			temp_image = pygame.transform.scale(temp_image, (96, 96))
 			if self.orientation == 'left':
 				temp_image = pygame.transform.flip(temp_image, True, False)
 			self.image = temp_image
+			self.create_attack_hitbox()
 			return
 		else:
 			src_rect = pygame.Rect(
@@ -131,10 +135,11 @@ class Player(pygame.sprite.Sprite):
 				self.frame_height*3//4
 			)
 			temp_image = self.idle_image.subsurface(src_rect)
-			temp_image = pygame.transform.scale(temp_image, (64, 64))
+			temp_image = pygame.transform.scale(temp_image, (96, 96))
 			if self.orientation == 'left':
 				temp_image = pygame.transform.flip(temp_image, True, False)
 			self.image = temp_image
+			self.delete_attack_hitbox()
 
 	def update(self, boundary_rect):
 		self.input()
@@ -158,7 +163,14 @@ class Player(pygame.sprite.Sprite):
 	def draw(self, surface):
 		surface.blit(self.image, self.rect.topleft)
 
-class Hitbox(Player):
-	def __init__(self, attack_image, pos, groups):
-		super().__init__(pos, groups)
-		
+class AttackHitbox(pygame.sprite.Sprite):
+	def __init__(self, player, groups):
+		super().__init__(groups)
+		orientation = player.orientation
+		self.image = pygame.Surface((96, 96), pygame.SRCALPHA)
+		if orientation == 'right':
+			self.image.fill((255, 0, 0, 100))  # Semi-transparent red
+			self.rect = self.image.get_rect(center = (player.rect.right, player.rect.centery - 10))
+		else:
+			self.image.fill((255, 0, 0, 100))  # Semi-transparent red
+			self.rect = self.image.get_rect(center = (player.rect.left, player.rect.centery - 10))
