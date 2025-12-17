@@ -39,6 +39,18 @@ class Player(pygame.sprite.Sprite):
 
 		self.obstacle_sprites = obstacle_sprites
 
+		# stats
+		self.health = 100
+		self.max_health = 100
+		self.stamina = 100
+		self.max_stamina = 100
+		self.attack_power = 10
+		self.defense = 5
+		
+		# Invincibility frames
+		self.invincibility_timer = 0
+		self.invincibility_duration = 60  # 1 second at 60 FPS
+
 	def input(self):
 		keys = pygame.key.get_pressed()
 		
@@ -77,11 +89,12 @@ class Player(pygame.sprite.Sprite):
 			self.rect.center = self.hitbox.center
 
 	def attack(self):
-		if self.attack_anim == False:
+		if self.attack_anim == False and self.stamina >= 10:
 			self.speed -= 2
 			self.attack_anim = True
 			self.attack_frame = 4
 			self.current_frame = 0
+			self.stamina -= 10
 
 	def collide(self, direction):
 		if direction == 'horizontal':
@@ -111,6 +124,8 @@ class Player(pygame.sprite.Sprite):
 		else:
 			self.current_frame = (self.current_frame + 1) % 8
 			self.update_sprite()
+
+		self.stamina = min(self.stamina + 0.5, self.max_stamina)
 
 	def update_sprite(self):
 		if self.attack_anim:
@@ -149,6 +164,18 @@ class Player(pygame.sprite.Sprite):
 		if self.anim_interval >= 1:
 			self.anim_interval = 0
 			self.animate()
+		
+		# Update invincibility timer
+		if self.invincibility_timer > 0:
+			self.invincibility_timer -= 1
+	
+	def take_damage(self, damage):
+		if self.invincibility_timer <= 0:
+			actual_damage = max(1, damage - self.defense)
+			self.health -= actual_damage
+			if self.health < 0:
+				self.health = 0
+			self.invincibility_timer = self.invincibility_duration
 
 	def draw(self, surface):
 		surface.blit(self.image, self.rect.topleft)

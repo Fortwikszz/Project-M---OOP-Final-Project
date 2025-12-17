@@ -26,15 +26,15 @@
   <image source="../Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Buildings/Black Buildings/House1.png" width="128" height="192"/>
  </tile>
  <tile id="8">
-  <image source="C:/Users/ASUS/Downloads/n.png" width="2944" height="1440"/>
+  <image source="" width="2944" height="1440"/>
  </tile>
  <tile id="9">
-  <image source="../Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Buildings/Black Buildings/1765970649810.png" width="714" height="349"/>
+  <image source="" width="714" height="349"/>
  </tile>
  <tile id="10">
-  <image source="../Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Buildings/Black Buildings/1765972079848.png" width="1280" height="514"/>
+  <image source="" width="1280" height="514"/>
  </tile>
  <tile id="11">
-  <image source="../Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Buildings/Black Buildings/1765971597713.png" width="2816" height="912"/>
+  <image source="" width="2816" height="912"/>
  </tile>
 </tileset>
