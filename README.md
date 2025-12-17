@@ -79,17 +79,14 @@ Project-M---OOP-Final-Project/
 Solution: Install pygame-ce first
 ```bash
 pip install pygame-ce
+
+```
+**Note:** If you have previously installed the original `pygame` (not `pygame-ce`), uninstall it first to avoid conflicts:
+```bash
+pip uninstall pygame
+pip install pygame-ce
 ```
 ```bash
-# Correct ✅
-cd Project-M---OOP-Final-Project
-python -m code.main
-
-# Wrong ❌
-cd Project-M---OOP-Final-Project/code
-python main.py
-```
-
 ### Typo: 'pyhton' is not recognized
 
 Make sure to type `python` correctly (not `pyhton`)
