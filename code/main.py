@@ -1,6 +1,6 @@
 import pygame, sys
-from settings import *
-from level import *
+from code.settings import *
+from code.level import *
 pygame.init()
 
 

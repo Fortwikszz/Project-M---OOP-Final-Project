@@ -1,9 +1,10 @@
 import pygame
-from settings import *
+from code.settings import *
 import os
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, image=None):
         super().__init__(groups)
-        self.image = pygame.image.load(os.path.join('test', 'Rock2.png')).convert_alpha()
+        self.image = image
         self.rect = self.image.get_rect(topleft = pos)
+        self.hitbox = self.rect.inflate(0, 0)
