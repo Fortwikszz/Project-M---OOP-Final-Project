@@ -14,6 +14,31 @@ class Player(pygame.sprite.Sprite):
 		self.frame_width = self.sheet_width // 8
 		self.frame_height = self.sheet_height // 1
 
+		# Load sound effects
+		self.attack_sound = None
+		self.level_up_sound = None
+		try:
+			audio_path = os.path.join("audio", "sword_slash.mp3")
+			if os.path.exists(audio_path):
+				self.attack_sound = pygame.mixer.Sound(audio_path)
+				self.attack_sound.set_volume(0.5)
+				print(f"Loaded sword_slash sound from {audio_path}")
+			else:
+				print(f"Sound file not found: {audio_path}")
+		except Exception as e:
+			print(f"Warning: Could not load sword_slash sound: {e}")
+		
+		try:
+			level_up_audio = os.path.join("audio", "level_up.mp3")
+			if os.path.exists(level_up_audio):
+				self.level_up_sound = pygame.mixer.Sound(level_up_audio)
+				self.level_up_sound.set_volume(0.6)
+				print(f"Loaded level_up sound from {level_up_audio}")
+			else:
+				print(f"Sound file not found: {level_up_audio}")
+		except Exception as e:
+			print(f"Warning: Could not load level_up sound: {e}")
+
 		self.current_frame = 0
 		self.current_row = 0
 		self.is_moving = False
@@ -46,6 +71,11 @@ class Player(pygame.sprite.Sprite):
 		self.max_stamina = 100
 		self.attack_power = 10
 		self.defense = 5
+		
+		# EXP and Level system
+		self.level = 1
+		self.exp = 0
+		self.exp_to_next_level = 50
 		
 		# Invincibility frames
 		self.invincibility_timer = 0
@@ -95,6 +125,9 @@ class Player(pygame.sprite.Sprite):
 			self.attack_frame = 4
 			self.current_frame = 0
 			self.stamina -= 10
+			# Play attack sound
+			if self.attack_sound:
+				self.attack_sound.play()
 
 	def collide(self, direction):
 		if direction == 'horizontal':
@@ -155,6 +188,35 @@ class Player(pygame.sprite.Sprite):
 				temp_image = pygame.transform.flip(temp_image, True, False)
 			self.image = temp_image
 			self.delete_attack_hitbox()
+	
+	def gain_exp(self, amount):
+		"""Gain experience points and level up if needed"""
+		self.exp += amount
+		
+		# Check for level up
+		while self.exp >= self.exp_to_next_level:
+			self.level_up()
+	
+	def level_up(self):
+		"""Level up and increase stats"""
+		self.exp -= self.exp_to_next_level
+		self.level += 1
+		
+		# Play level up sound
+		if self.level_up_sound:
+			self.level_up_sound.play()
+		
+		# Increase exp requirement for next level
+		# Formula: base (50) + (level * 10)
+		self.exp_to_next_level = 50 + (self.level - 1) * 10
+		
+		# Increase stats
+		self.max_health += 10
+		self.health = self.max_health  # Heal to full on level up
+		self.max_stamina += 5
+		self.stamina = self.max_stamina
+		self.attack_power += 2
+		self.defense += 1
 
 	def update(self, boundary_rect):
 		self.input()
@@ -195,9 +257,9 @@ class AttackHitbox(pygame.sprite.Sprite):
 		super().__init__(groups)
 		orientation = player.orientation
 		self.image = pygame.Surface((96, 96), pygame.SRCALPHA)
+		# Completely transparent - no visible color
+		self.image.fill((0, 0, 0, 0))
 		if orientation == 'right':
-			self.image.fill((255, 0, 0, 100))  # Semi-transparent red
 			self.rect = self.image.get_rect(center = (player.rect.right, player.rect.centery - 10))
 		else:
-			self.image.fill((255, 0, 0, 100))  # Semi-transparent red
 			self.rect = self.image.get_rect(center = (player.rect.left, player.rect.centery - 10))
