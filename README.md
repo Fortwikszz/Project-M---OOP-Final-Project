@@ -1,5 +1,12 @@
 # Project M - OOP Final Project
 
+A game by:
+
+| Name                              | NRP        |
+|-----------------------------------|------------|
+| Tri Ismunhadi Julik Cakra Wibawa  | 5054241017 |
+| Marvel Mahanara                   | 5054241047 |
+
 A game project built with Pygame-CE and Python 3.12
 
 ## Prerequisites
