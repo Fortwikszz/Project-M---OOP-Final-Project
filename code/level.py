@@ -397,3 +397,9 @@ class YsortCameraGroup(pygame.sprite.Group):
             if sprite not in ground_sprites:  # Don't draw ground sprites twice
                 offset_pos = sprite.rect.topleft - self.offset
                 self.display_surface.blit(sprite.image, offset_pos)
+        
+        # Draw health bars for enemies (Goblin only, not Boss)
+        from code.enemy import Goblin
+        for sprite in self.sprites():
+            if isinstance(sprite, Goblin):
+                sprite.draw_health_bar(self.display_surface, -self.offset)

@@ -161,6 +161,41 @@ class Goblin(Entity):
                 temp_image = pygame.transform.flip(temp_image, True, False)
             self.image = temp_image
 
+    def draw_health_bar(self, surface, camera_offset):
+        """Draw health bar below the enemy"""
+        if self.health <= 0:
+            return
+            
+        # Health bar dimensions
+        bar_width = 60
+        bar_height = 6
+        border_width = 1
+        
+        # Position below enemy's feet
+        bar_x = self.rect.centerx - bar_width // 2 + camera_offset.x
+        bar_y = self.rect.bottom - 20 + camera_offset.y
+        
+        # Calculate health percentage
+        health_ratio = self.health / self.max_health
+        
+        # Draw background (dark red)
+        background_rect = pygame.Rect(bar_x, bar_y, bar_width, bar_height)
+        pygame.draw.rect(surface, (60, 20, 20), background_rect)
+        
+        # Draw current health (green to red based on health)
+        if health_ratio > 0.5:
+            bar_color = (50, 200, 50)  # Green
+        elif health_ratio > 0.25:
+            bar_color = (255, 200, 0)  # Yellow
+        else:
+            bar_color = (220, 50, 50)  # Red
+            
+        health_rect = pygame.Rect(bar_x, bar_y, int(bar_width * health_ratio), bar_height)
+        pygame.draw.rect(surface, bar_color, health_rect)
+        
+        # Draw border
+        pygame.draw.rect(surface, (20, 20, 20), background_rect, border_width)
+
     def update(self, boundary_rect):
         self.ai_behavior()
         self.move(boundary_rect)
@@ -174,239 +209,6 @@ class Goblin(Entity):
         if self.invincibility_timer > 0:
             self.invincibility_timer -= 1
 
-
-class Dynamite(pygame.sprite.Sprite):
-    """Projectile thrown by TNT Goblin"""
-    def __init__(self, pos, target_pos, groups, damage):
-        super().__init__(groups)
-        
-        # Try to load dynamite sprite, fallback to simple sprite if not found
-        try:
-            assets_path = os.path.join("assets", "Tiny Swords", "Tiny Swords (Update 010)", "Factions", "Goblins", "Troops", "TNT", "Dynamite")
-            dynamite_image = pygame.image.load(os.path.join(assets_path, "Dynamite.png")).convert_alpha()
-            
-            # Dynamite.png has 8 frames horizontally
-            self.frame_width = dynamite_image.get_width() // 8
-            self.frame_height = dynamite_image.get_height()
-            self.dynamite_sheet = dynamite_image
-            self.has_sprite = True
-        except:
-            # Fallback: create a simple red circle
-            self.has_sprite = False
-            self.dynamite_sheet = None
-        
-        self.current_frame = 0
-        self.anim_interval = 0
-        
-        # Initial image
-        if self.has_sprite:
-            temp_image = self.dynamite_sheet.subsurface(pygame.Rect(0, 0, self.frame_width, self.frame_height))
-            self.image = pygame.transform.scale(temp_image, (32, 32))
-        else:
-            # Simple red circle as fallback
-            self.image = pygame.Surface((32, 32), pygame.SRCALPHA)
-            pygame.draw.circle(self.image, (255, 50, 50), (16, 16), 12)
-        
-        self.rect = self.image.get_rect(center=pos)
-        
-        # Movement
-        self.pos = pygame.math.Vector2(pos)
-        direction = pygame.math.Vector2(target_pos) - self.pos
-        if direction.length() > 0:
-            self.velocity = direction.normalize() * 5
-        else:
-            self.velocity = pygame.math.Vector2(0, 0)
-        
-        self.damage = damage
-        self.lifetime = 120  # 2 seconds at 60 FPS
-        
-    def animate(self):
-        if self.has_sprite:
-            self.current_frame = (self.current_frame + 1) % 8
-            src_rect = pygame.Rect(
-                self.current_frame * self.frame_width,
-                0,
-                self.frame_width,
-                self.frame_height
-            )
-            temp_image = self.dynamite_sheet.subsurface(src_rect)
-            self.image = pygame.transform.scale(temp_image, (32, 32))
-    
-    def update(self, boundary_rect=None):
-        # Move
-        self.pos += self.velocity
-        self.rect.center = self.pos
-        
-        # Animate
-        if self.anim_interval < 1:
-            self.anim_interval += 0.2
-        if self.anim_interval >= 1:
-            self.anim_interval = 0
-            self.animate()
-        
-        # Decrease lifetime
-        self.lifetime -= 1
-        if self.lifetime <= 0:
-            self.kill()
-
-
-class TNTGoblin(Entity):
-    """Ranged goblin that throws dynamite"""
-    def __init__(self, pos, groups, obstacle_sprites, player, spawn_projectile):
-        super().__init__(groups)
-        self.spawn_projectile = spawn_projectile
-        
-        assets_path = os.path.join("assets", "Tiny Swords", "Tiny Swords (Update 010)", "Factions", "Goblins", "Troops", "Torch", "Purple")
-        self.full_image = pygame.image.load(os.path.join(assets_path, "Torch_Purple.png")).convert_alpha()
-        
-        # Use Torch_Purple.png structure (same as regular Goblin)
-        self.idle_image = self.full_image.subsurface((0, 0, self.full_image.get_width(), self.full_image.get_height()//5))
-        self.attack_image = self.full_image.subsurface((0, self.full_image.get_height()//5*2, self.full_image.get_width(), self.full_image.get_height()//5))
-        
-        self.sheet_width, self.sheet_height = self.idle_image.get_size()
-        self.frame_width = self.sheet_width // 7
-        self.frame_height = self.sheet_height // 1
-
-        self.current_frame = 0
-        temp_image = self.idle_image.subsurface(pygame.Rect(0, 0, self.frame_width, self.frame_height))
-        self.image = pygame.transform.scale(temp_image, (128, 128))
-        self.rect = self.image.get_rect(topleft=pos)
-        self.hitbox = self.rect.inflate(-10, -30)
-        self.anim_interval = 0
-
-        self.direction = pygame.math.Vector2()
-        self.speed = 1.5  # Slower than regular goblin
-        self.orientation = 'right'
-
-        self.attack_anim = False
-        self.attack_frame = 0
-        self.attack_cooldown = 0
-
-        self.obstacle_sprites = obstacle_sprites
-        self.player = player
-
-        # Stats - stronger but slower
-        self.health = 150
-        self.max_health = 150
-        self.attack_power = 25
-        self.defense = 1
-        self.detection_radius = 400  # Longer detection range
-        self.attack_radius = 250  # Can attack from distance
-        self.min_distance = 150  # Keeps distance from player
-        
-        # Invincibility frames
-        self.invincibility_timer = 0
-        self.invincibility_duration = 60
-
-    def ai_behavior(self):
-        """AI logic - keep distance and throw TNT"""
-        player_vector = pygame.math.Vector2(self.player.rect.center) - pygame.math.Vector2(self.rect.center)
-        distance = player_vector.length()
-
-        self.direction.x = 0
-        self.direction.y = 0
-
-        if distance < self.detection_radius and distance > 0:
-            if distance < self.min_distance:
-                # Too close - back away
-                self.direction = -player_vector.normalize()
-                
-                # Update orientation
-                if self.direction.x > 0:
-                    self.orientation = 'right'
-                elif self.direction.x < 0:
-                    self.orientation = 'left'
-            elif distance > self.attack_radius:
-                # Too far - move closer
-                self.direction = player_vector.normalize()
-                
-                # Update orientation
-                if self.direction.x > 0:
-                    self.orientation = 'right'
-                elif self.direction.x < 0:
-                    self.orientation = 'left'
-            else:
-                # In range - attack
-                if self.attack_cooldown <= 0 and not self.attack_anim:
-                    self.attack()
-
-    def attack(self):
-        """Throw dynamite"""
-        if not self.attack_anim:
-            self.speed -= 0.5
-            self.attack_anim = True
-            self.attack_frame = 4
-            self.current_frame = 0
-            self.attack_cooldown = 120  # Longer cooldown than melee
-            
-            # Spawn dynamite projectile
-            try:
-                self.spawn_projectile(self.rect.center, self.player.rect.center, self.attack_power)
-            except Exception as e:
-                print(f"Error spawning projectile: {e}")
-                pass
-    
-    def take_damage(self, damage):
-        if self.invincibility_timer <= 0:
-            actual_damage = max(1, damage - self.defense)
-            self.health -= actual_damage
-            if self.health < 0:
-                self.health = 0
-            self.invincibility_timer = self.invincibility_duration
-
-    def animate(self):
-        if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1
-
-        if self.attack_anim:
-            self.attack_frame -= 1
-            if self.attack_frame <= 0:
-                self.attack_anim = False
-                self.speed += 0.5
-            self.current_frame = (self.current_frame + 1) % 6
-            self.update_sprite()
-        else:
-            self.current_frame = (self.current_frame + 1) % 7
-            self.update_sprite()
-
-    def update_sprite(self):
-        if self.attack_anim:
-            src_rect = pygame.Rect(
-                self.current_frame * self.frame_width,
-                0,
-                self.frame_width,
-                self.frame_height
-            )
-            temp_image = self.attack_image.subsurface(src_rect)
-            temp_image = pygame.transform.scale(temp_image, (128, 128))
-            if self.orientation == 'left':
-                temp_image = pygame.transform.flip(temp_image, True, False)
-            self.image = temp_image
-        else:
-            src_rect = pygame.Rect(
-                self.current_frame * self.frame_width,
-                0,
-                self.frame_width,
-                self.frame_height
-            )
-            temp_image = self.idle_image.subsurface(src_rect)
-            temp_image = pygame.transform.scale(temp_image, (128, 128))
-            if self.orientation == 'left':
-                temp_image = pygame.transform.flip(temp_image, True, False)
-            self.image = temp_image
-
-    def update(self, boundary_rect):
-        self.ai_behavior()
-        self.move(boundary_rect)
-        if self.anim_interval < 1:
-            self.anim_interval += 0.1
-        if self.anim_interval >= 1:
-            self.anim_interval = 0
-            self.animate()
-        
-        # Update invincibility timer
-        if self.invincibility_timer > 0:
-            self.invincibility_timer -= 1
 
 class Boss(Entity):
     """Boss enemy with high health and damage"""
