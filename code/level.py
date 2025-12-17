@@ -107,6 +107,36 @@ class Level:
         self.current_attack_hitbox = None
         self.near_interactable = None
         
+        # Change music based on map
+        if 'Boss_field' in new_map_path or 'boss_field' in new_map_path:
+            # Play boss fight music
+            try:
+                boss_music_path = os.path.join("audio", "boss_fight.mp3")
+                if os.path.exists(boss_music_path):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load(boss_music_path)
+                    pygame.mixer.music.set_volume(0.3)
+                    pygame.mixer.music.play(-1)
+                    print(f"Playing boss fight music from {boss_music_path}")
+                else:
+                    print(f"Boss fight music not found: {boss_music_path}")
+            except Exception as e:
+                print(f"Warning: Could not load boss fight music: {e}")
+        else:
+            # Play normal background music for regular maps
+            try:
+                bg_music_path = os.path.join("audio", "background.mp3")
+                if os.path.exists(bg_music_path):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load(bg_music_path)
+                    pygame.mixer.music.set_volume(0.2)
+                    pygame.mixer.music.play(-1)
+                    print(f"Playing background music from {bg_music_path}")
+                else:
+                    print(f"Background music not found: {bg_music_path}")
+            except Exception as e:
+                print(f"Warning: Could not load background music: {e}")
+        
         # Load new TMX map file
         new_map_path = os.path.join('assets', 'maps', new_map_path)
         tmx_data = pytmx.load_pygame(new_map_path)
